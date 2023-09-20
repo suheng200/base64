@@ -13,15 +13,20 @@
 #ifndef SUHENG_BASE64_H
 #define SUHENG_BASE64_H
 
+#define SUHENG_BASE64_ENCODE_SRC_MAX_LENGTH 1610612733
+#define SUHENG_BASE64_DECODE_SRC_MAX_LENGTH 2147483644
+
+
 /**
  * @brief The string is encoded using base64
  * 
  * @param[in]  src        the string needs to be encoded
  * @param[in]  src_len    string length
  * @param[out] dst        save the encode result,you need to alloc the space yourself,the memory space needs to be large enough to save the result
- * @param[in]  dst_size   size of dst,  dst_size > (1.34 * srclen) is a must
+ * @param[in]  dst_size   size of dst, dst_min_size = (src_len % 3 == 0) ? (src_len / 3) * 4 : (src_len / 3 + 1) * 4,you must be large than dst_min_size
  * @retval     -1   dst can't store the result
- *          
+ * @retval     -2   src len is out of the range[0, SUHENG_BASE64_ENCODE_SRC_MAX_LENGTH]
+ *@retval      >=0  length of encoded string
  */
 int base64_encode_str(const char *src, const int src_len, char *dst, int dst_size);
 
@@ -32,13 +37,13 @@ int base64_encode_str(const char *src, const int src_len, char *dst, int dst_siz
  * @param[in]  src        the string needs to be decoded
  * @param[in]  src_len    string length
  * @param[out] dst        save the encode result,you need to alloc the space yourself,the memory space needs to be large enough to save the result
- * @param[in]  dst_size   size of dst, dst_size > (0.75 * srclen) is a must
+ * @param[in]  dst_size   size of dst, dst_size must be greater than  4 * src_len / 3
  * @retval     -1   dst can't store the result
- * @retval     -2   src is invalid
+ * @retval     -2   src len is out of the range[0, SUHENG_BASE64_DECODE_SRC_MAX_LENGTH]
+ * @retval     -3   the string is valid
  * @retval     >=0  dst length
  */
 int base64_decode_str(const char *src, const int src_len, char *dst, int dst_size);
-
 
 
 static const char *ENCODE_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
